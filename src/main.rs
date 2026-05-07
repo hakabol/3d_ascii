@@ -14,12 +14,12 @@ fn main(){
     let torus = ascii_3d::torus(100.0, 30.0);
 
     loop{
-        ascii_3d::plot(&torus, a, b, [255, 255, 255], 250.0, [0.5, 0.5, -1.0]);
+        ascii_3d::plot(&torus, a, b, [255, 255, 255], 250.0, [0.5, 0.5, -1.0, 0.5, 0.5]);
 
         a += 0.03;
         b += 0.04;
 
-        thread::sleep(Duration::from_millis(20));
+        thread::sleep(Duration::from_millis(30));
 
         Command::new("clear").status().unwrap();
     }

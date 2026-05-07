@@ -26,7 +26,6 @@ fn make_matrix_torus(i_radius: f32, o_radius: f32) -> Vec<[f32; 3]>{
 }
 
 fn find_normals_torus(matrix: &mut Vec<[f32; 3]> , i_radius: f32, _o_radius: f32) -> Vec<[f32; 3]>{
-    matrix.sort_by(|a, b| a[0].partial_cmp(&b[0]).unwrap());
     let mut norm: Vec<[f32; 3]> = vec![];
     for point in matrix{
         let dist = (point[0].powi(2) + point[1].powi(2)).sqrt();
@@ -35,6 +34,17 @@ fn find_normals_torus(matrix: &mut Vec<[f32; 3]> , i_radius: f32, _o_radius: f32
             point[0] - i_radius*point[0]/dist,
             point[1] - i_radius*point[1]/dist,
             point[2] - i_radius*point[2]/dist
+        ];
+        let len = (
+            normal[0]*normal[0] +
+            normal[1]*normal[1] +
+            normal[2]*normal[2]
+        ).sqrt();
+
+        let normal = [
+            normal[0]/len,
+            normal[1]/len,
+            normal[2]/len
         ];
         
         norm.push(normal)
@@ -72,14 +82,14 @@ pub fn cube(size: i32) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
 
 }
 
-pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, color: [u8;3], scale: f32, light:[f32; 3]){
+pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, color: [u8;3], scale: f32, light:[f32; 5]){
     let sin_a = a.sin();
     let cos_a = a.cos();
     let sin_b = b.sin();
     let cos_b = b.cos();
 
-    let ambience = 0.8;
-    let contrast = 0.2;
+    let ambience = light[4];
+    let contrast = light[3];
 
     let z_offset = 2000.0;
 
@@ -112,7 +122,7 @@ pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, 
         let nx1 = nx;
 
         let nx2 = nx1 * cos_b - ny1 * sin_b;
-        let ny2 = nx1 * sin_b - ny1 * cos_b;
+        let ny2 = nx1 * sin_b + ny1 * cos_b;
         let nz2 = nz1;
 
         let brightness = ((nx2*light[0] + ny2*light[1] + nz2*light[2]) * contrast + ambience).clamp(0.0, 1.0); //calculates brightness clamp makes it 0 - 1
