@@ -52,34 +52,51 @@ fn find_normals_torus(matrix: &mut Vec<[f32; 3]> , i_radius: f32, _o_radius: f32
     norm
 }
 
-pub fn cube(size: i32) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
+pub fn cube(size: i32, displace: [f32; 3]) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
     let mut matrix: Vec<[f32; 3]> = vec![];
     let mut normals: Vec<[f32; 3]> = vec![];
 
+    let dis_x = displace[0];
+    let dis_y = displace[1];
+    let dis_z = displace[2];
+
     for width in -size/2..=size/2{
         for height in -size/2..=size/2{
-            matrix.push([width as f32, height as f32, size as f32/2.0 ]);
+            matrix.push([width as f32 + dis_x, height as f32 + dis_y, size as f32/2.0 + dis_z]);
             normals.push([0.0, 0.0, 1.0]);
 
-            matrix.push([width as f32, height as f32, -size as f32/2.0]);
+            matrix.push([width as f32 + dis_x, height as f32 + dis_y, -size as f32/2.0 + dis_z]);
             normals.push([0.0, 0.0, -1.0]);
 
-            matrix.push([width as f32, size as f32/2.0, height as f32]);
+            matrix.push([width as f32 + dis_x, size as f32/2.0 + dis_y, height as f32 + dis_z]);
             normals.push([0.0, 1.0, 0.0]);
 
-            matrix.push([width as f32, -size as f32/2.0, height as f32]);
+            matrix.push([width as f32 + dis_x, -size as f32/2.0 + dis_y, height as f32 + dis_z]);
             normals.push([0.0, -1.0, 0.0]);
 
-            matrix.push([size as f32/2.0, height as f32, width as f32]);
+            matrix.push([size as f32/2.0 + dis_x, height as f32 + dis_y, width as f32 + dis_z]);
             normals.push([1.0, 0.0, 0.0]);
 
-            matrix.push([-size as f32/2.0, height as f32, width as f32]);
+            matrix.push([-size as f32/2.0 + dis_x, height as f32 + dis_y, width as f32 + dis_z]);
             normals.push([-1.0, 0.0, 0.0]);
 
         }
     }
     (matrix, normals)
 
+}
+
+pub fn combine(shapes: &[(Vec<[f32; 3]>, Vec<[f32; 3]>)]) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
+    let mut screen: (Vec<[f32; 3]>, Vec<[f32; 3]>) = (vec![], vec![]);
+
+    for shape in shapes{
+        for (p, n) in shape.0.iter().zip(shape.1.iter()){
+            screen.0.push(*p);
+            screen.1.push(*n);
+        }
+    }
+
+    screen
 }
 
 pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, color: [u8;3], scale: f32, light:[f32; 5]){

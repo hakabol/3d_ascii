@@ -12,9 +12,12 @@ fn main(){
     let mut b = 0.0;
 
     let torus = ascii_3d::torus(100.0, 30.0);
+    let cube = ascii_3d::cube(100, [100.0, 0.0, 100.0]);
+
+    let screen = ascii_3d::combine(&[cube, torus]);
 
     loop{
-        ascii_3d::plot(&torus, a, b, [255, 255, 255], 250.0, [0.5, 0.5, -1.0, 0.5, 0.5]);
+        ascii_3d::plot(&screen, a, b, [255, 255, 255], 250.0, [0.5, 0.5, -1.0, 0.5, 0.5]);
 
         a += 0.03;
         b += 0.04;
