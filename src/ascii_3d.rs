@@ -86,6 +86,54 @@ pub fn cube(size: i32, displace: [f32; 3]) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
 
 }
 
+pub fn rotate(rx: f32, ry:f32, (matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>)) -> (Vec<[f32; 3]>, Vec<[f32; 3]>) {
+    let sin_a = rx.sin();
+    let cos_a = rx.cos();
+    let sin_b = ry.sin();
+    let cos_b = ry.cos();
+
+    let mut new_normals: Vec<[f32; 3]> = vec![];
+    let mut new_matrix: Vec<[f32; 3]> = vec![];
+
+    for i in 0..matrix.len(){
+        let [x, y, z] = matrix[i];
+
+        let y1 = y * cos_a - z * sin_a;
+        let z1 = y * sin_a + z * cos_a;
+        let x1 = x;
+
+        let x2 = x1 * cos_b - y1 * sin_b;
+        let y2 = x1 * sin_b + y1 * cos_b;
+        let z2 = z1*1.0;
+        
+        new_matrix.push([x2, y2, z2]);
+
+        let [nx, ny, nz] = normals[i];
+
+        let ny1 = ny * cos_a - nz * sin_a;
+        let nz1 = ny * sin_a - nz * cos_a;
+        let nx1 = nx;
+
+        let nx2 = nx1 * cos_b - ny1 * sin_b;
+        let ny2 = nx1 * sin_b + ny1 * cos_b;
+        let nz2 = nz1;
+
+        new_normals.push([nx2, ny2, nz2]);
+    }
+
+    (new_matrix, new_normals)
+}
+
+pub fn displace([dx, dy, dz]: [f32; 3], (matrix, normals): (Vec<[f32; 3]>, Vec<[f32; 3]>)) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
+    let mut new_matrix: Vec<[f32; 3]> = vec![];
+
+    for [x, y, z] in matrix{
+        new_matrix.push([x + dx, y + dy, z + dz])
+    }
+
+    (new_matrix, normals)
+}
+
 pub fn combine(shapes: &[(Vec<[f32; 3]>, Vec<[f32; 3]>)]) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
     let mut screen: (Vec<[f32; 3]>, Vec<[f32; 3]>) = (vec![], vec![]);
 
