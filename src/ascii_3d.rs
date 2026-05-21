@@ -1,5 +1,9 @@
 const CHARS: &str = ".:-=+*#%@";
 
+const WIDTH: usize = 594;
+const HEIGHT: usize = 120;
+
+
 
 pub fn torus(i_radius: f32, o_radius: f32) -> (Vec<[f32; 3]>, Vec<[f32; 3]>){
     let mut matrix = make_matrix_torus(i_radius, o_radius);
@@ -111,7 +115,7 @@ pub fn rotate(rx: f32, ry:f32, (matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>
         let [nx, ny, nz] = normals[i];
 
         let ny1 = ny * cos_a - nz * sin_a;
-        let nz1 = ny * sin_a - nz * cos_a;
+        let nz1 = ny * sin_a + nz * cos_a;
         let nx1 = nx;
 
         let nx2 = nx1 * cos_b - ny1 * sin_b;
@@ -158,11 +162,8 @@ pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, 
 
     let z_offset = 2000.0;
 
-    let width = 150;
-    let height = 40;
-
-    let mut screen = vec![' '; width*height]; //chars to print
-    let mut zbuffer = vec![f32::MAX; width*height]; //keeps track of closest point f32::MIN =
+    let mut screen = vec![' '; WIDTH*HEIGHT]; //chars to print
+    let mut zbuffer = vec![f32::MAX; WIDTH*HEIGHT]; //keeps track of closest point f32::MIN =
     //smallest possible f32 value
 
     for (point, normal) in matrix.iter().zip(normals.iter()){ //iterates through normals and matrix
@@ -183,7 +184,7 @@ pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, 
         let nz = normal[2];
 
         let ny1 = ny * cos_a - nz * sin_a;
-        let nz1 = ny * sin_a - nz * cos_a;
+        let nz1 = ny * sin_a + nz * cos_a;
         let nx1 = nx;
 
         let nx2 = nx1 * cos_b - ny1 * sin_b;
@@ -201,15 +202,15 @@ pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, 
         let idx = (brightness*(CHARS.len() - 1) as f32) as usize; // maps brightness as an index
         let ch = CHARS.chars().nth(idx).unwrap();
 
-        let screen_x = ((x2)*inv_z*scale + width as f32 / 2.0) as isize; //projects it
-        let screen_y = ((y2)*inv_z*scale*0.5 + height as f32 / 2.0) as isize; //projects it
+        let screen_x = ((x2)*inv_z*scale + WIDTH as f32 / 2.0) as isize; //projects it
+        let screen_y = ((y2)*inv_z*scale*0.5 + HEIGHT as f32 / 2.0) as isize; //projects it
 
-        if screen_x < 0 || screen_x >= width as isize || screen_y < 0 || screen_y >= height as isize {continue;} // bount checks
-        if z2 < -100.0 || z2 > 100.0 {
-            continue;
-        } //removes arifacts
+        if screen_x < 0 || screen_x >= WIDTH as isize || screen_y < 0 || screen_y >= HEIGHT as isize {continue;} // bount checks
+        //if z2 < -100.0 || z2 > 100.0 {
+        //    continue;
+        //} //removes arifacts
 
-        let idx = (screen_y as usize) * width + (screen_x as usize); //converts to an index
+        let idx = (screen_y as usize) * WIDTH + (screen_x as usize); //converts to an index
 
         let depth = z2 + z_offset;
 
@@ -219,10 +220,10 @@ pub fn plot((matrix, normals): &(Vec<[f32; 3]>, Vec<[f32; 3]>), a: f32, b: f32, 
         }
     }
 
-    for y in 0..height{
-        for x in 0..width{
-            print!("\x1b[38;2;{};{};{}m{}\x1b[0m",color[0], color[1], color[2], screen[y*width + x]);
+    for y in 0..HEIGHT{
+        for x in 0..WIDTH{
+            print!("\x1b[38;2;{};{};{}m{}\x1b[0m",color[0], color[1], color[2], screen[y*WIDTH + x]);
         }
-        println!();
+        print!("\r\n");
     }
 }
